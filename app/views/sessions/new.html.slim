@@ -11,4 +11,7 @@ h1 Log in
       = password_field_tag :password, "", placeholder: "Password"
   .control-group
     .controls
-      = submit_tag "Log in", class: "btn btn-primary"
+      label.checkbox
+        = check_box_tag :remember_me, "1", params[:remember_me]
+        | Remember me
+      button.btn.btn-primary type="submit" Log in
