@@ -1,4 +1,14 @@
 MuusicBase::Application.routes.draw do
+
+  root to: 'Home#index'
+
+  get 'signup' => 'Users#new', as: 'signup'
+  get 'login' => 'Sessions#new', as: 'login'
+  get 'logout' => 'Sessions#destroy', as: 'logout'
+
+  resources :users, only: [:new, :create]
+  resources :sessions, only: [:new, :create, :destroy]
+
   # The priority is based upon order of creation:
   # first created -> highest priority.
 

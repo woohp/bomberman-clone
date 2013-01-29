@@ -1,0 +1,41 @@
+doctype 5
+html
+  head
+    title Muusic
+    = stylesheet_link_tag    "application", media: :all
+    = javascript_include_tag "application"
+    = csrf_meta_tags
+
+  body
+    javascript:
+      var bootstrap_data = #{@bootstrap_data.to_json.html_safe};
+
+    .navbar.navbar-fixed-top
+      .navbar-inner
+        .container
+          a.brand href=root_path Muusic
+
+          ul.nav.nav-tabs.pull-right
+            - if current_user
+              li
+                a= current_user.username
+              li= link_to "Log out", logout_path
+            - else
+              li= link_to "Sign up", signup_path
+              li= link_to "Log in", login_path
+
+    .container
+      - if flash[:notice].present?
+        .alert.alert-success
+          button.close type="button" data-dismiss="alert" &times;
+          = flash[:notice]
+      - if flash[:error].present?
+        .alert.alert-error
+          button.close type="button" data-dismiss="alert" &times;
+          = flash[:error]
+      - if flash[:info].present?
+        .alert.alert-info
+          button.close type="button" data-dismiss="alert" &times;
+          = flash[:info]
+
+      = yield

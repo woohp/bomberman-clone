@@ -1,0 +1,12 @@
+h1 Sign Up
+
+= bootstrap_form_for @user, html: {class: "form-horizontal"} do |f|
+  = f.alert_message "Please fix the errors below."
+
+  = f.text_field :username, label: "Username", placeholder: "Username"
+  = f.email_field :email, label: "Email"
+  = f.password_field :password, label: "Password"
+  = f.password_field :password_confirmation, label: "Password Confirmation"
+  = f.control_group do
+    = f.primary "Submit"
+
