@@ -4,9 +4,9 @@ h1 Sign Up
   = f.alert_message "Please fix the errors below."
 
   = f.text_field :username, label: "Username", placeholder: "Username"
-  = f.email_field :email, label: "Email"
-  = f.password_field :password, label: "Password"
-  = f.password_field :password_confirmation, label: "Password Confirmation"
+  = f.email_field :email, label: "Email", placeholder: "Email"
+  = f.password_field :password, label: "Password", placeholder: "Password"
+  = f.password_field :password_confirmation, label: "Password Confirmation", placeholder: "Password Confirmation"
   = f.control_group do
     = f.primary "Submit"
 
