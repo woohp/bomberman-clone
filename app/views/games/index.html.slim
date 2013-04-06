@@ -1,0 +1,7 @@
+h3 Open Games:
+ul.unstyled
+  - for game in @games
+    li= link_to "#{game.player1.username}'s game", game
+
+= form_for @new_game do |f|
+  = f.submit "Create Game", :class => "btn btn-primary"

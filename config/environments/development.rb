@@ -36,4 +36,6 @@ MuusicBase::Application.configure do
   config.assets.debug = true
 
   Slim::Engine.set_default_options pretty: true, sort_attrs: false
+
+  config.middleware.delete Rack::Lock
 end

@@ -1,0 +1,9 @@
+- if @game.player1_id == current_user.id
+  .row
+  	button#start-game.btn.btn-primary.btn-large.span2 Start Game
+- else
+  p#joiner-message
+
+
+br
+canvas#game

@@ -1,13 +1,11 @@
 source 'https://rubygems.org'
 
-gem 'rails', '3.2.11'
+gem 'rails', '~> 3.2.12'
 
 # Bundle edge Rails instead:
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
 
 gem 'sqlite3'
-
-gem 'sorcery'
 
 # Gems used only for assets and not required
 # in production environments by default.
@@ -23,9 +21,13 @@ group :assets do
   gem 'bootstrap-sass'
 end
 
+gem 'thin'
 gem 'jquery-rails'
 gem 'slim-rails'
+gem 'websocket-rails'
+gem 'sorcery'
 gem 'bootstrap_form'
+gem 'simple_enum'
 
 group :development do
   gem 'better_errors'

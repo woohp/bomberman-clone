@@ -7,7 +7,8 @@ class UsersController < ApplicationController
     params[:user][:email] = nil if params[:user][:email].blank?
     @user = User.new params[:user]
     if @user.save
-      redirect_to root_url, notice: "Signed up!"
+      auto_login(@user)
+      redirect_to games_path, notice: "Signed up!"
     else
       render :new
     end
