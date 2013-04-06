@@ -41,6 +41,9 @@ class Player extends Unit
   constructor: (@playerName, y, x, @speed) ->
     super('player', y, x)
 
+    # vision
+    @vision = 7
+
     # items related
     @numBombs = 1
     @numShurikens = 1
@@ -84,7 +87,7 @@ class Player extends Unit
     return false if dy != @dy and dx != @dx
     return false if @targetY + dy < 0 or @targetY + dy == width or
       @targetX + dx < 0 or @targetX + dx == height
-    return false if beliefMap[@targetY + dy][@targetX + dx]
+    return false if trueMap[@targetY + dy][@targetX + dx]
 
     unitAtTarget = unitsMap[@targetY + dy][@targetX + dx]
     return false if unitAtTarget != null and
@@ -189,28 +192,28 @@ class Bomb extends Item
     @top = @y
     @bottom = @y
     while @left > 0 and Math.abs(@left - @x) < @strength
-      terrain = beliefMap[@y][@left-1]
+      terrain = trueMap[@y][@left-1]
       unit = unitsMap[@y][@left-1]
       if terrain == EMPTY or terrain == BOX or unit
         @left -= 1
       if terrain == BRICK or terrain == BOX or unit
         break
     while @right < width - 1 and Math.abs(@right - @x) < @strength
-      terrain = beliefMap[@y][@right+1]
+      terrain = trueMap[@y][@right+1]
       unit = unitsMap[@y][@right+1]
       if terrain == EMPTY or terrain == BOX or unit
         @right += 1
       if terrain == BRICK or terrain == BOX or unit
         break
     while @top > 0 and Math.abs(@top - @y) < @strength
-      terrain = beliefMap[@top-1][@x]
+      terrain = trueMap[@top-1][@x]
       unit = unitsMap[@top-1][@x]
       if terrain == EMPTY or terrain == BOX or unit
         @top -= 1
       if terrain == BRICK or terrain == BOX or unit
         break
     while @bottom < height - 1 and Math.abs(@bottom - @y) < @strength
-      terrain = beliefMap[@bottom+1][@x]
+      terrain = trueMap[@bottom+1][@x]
       unit = unitsMap[@bottom+1][@x]
       if terrain == EMPTY or terrain == BOX or unit
         @bottom += 1
@@ -394,6 +397,19 @@ class Shoe extends Item
     ctx.drawImage(Shoe.image, @x * GRID_SIZE, @y * GRID_SIZE)
 
 
+class Glasses extends Item
+  @image: new Image()
+
+  constructor: (y, x) ->
+    super('glasses', y, x)
+
+  acquiredBy: (player) ->
+    player.vision += 1
+
+  drawStatic: (ctx) ->
+    ctx.drawImage(Glasses.image, @x * GRID_SIZE, @y * GRID_SIZE)
+
+
 # event variables
 keyDown =
   left: false
@@ -495,7 +511,7 @@ initNetwork = ->
 
 initGame = (gameMap) ->
   trueMap = gameMap  
-  beliefMap = trueMap
+  beliefMap = $.extend(true, [], trueMap)
 
   unitsMap = ((null for x in [0...width]) for y in [0...height])
 
@@ -606,9 +622,16 @@ drawGame = ->
   ctx = canvas.getContext('2d')
   ctx.clearRect(0, 0, canvasWidth, canvasHeight)
 
+  [myY, myX] = myPlayer.centerPosition()
+
   # draw map
   for y in [0...height]
     for x in [0...width]
+      outsideVision = true
+      if Math.abs(y - myY) + Math.abs(x - myX) < myPlayer.vision
+        beliefMap[y][x] = trueMap[y][x]
+        outsideVision = false
+
       if beliefMap[y][x] == EMPTY
         ctx.fillStyle = 'green'
       else if beliefMap[y][x] == BRICK
@@ -617,18 +640,25 @@ drawGame = ->
         ctx.fillStyle = 'BurlyWood'
       ctx.fillRect(x * GRID_SIZE, y * GRID_SIZE, GRID_SIZE, GRID_SIZE)
 
+      if outsideVision
+        ctx.fillStyle = 'rgba(64, 64, 64, 0.35)'
+        ctx.fillRect(x * GRID_SIZE, y * GRID_SIZE, GRID_SIZE, GRID_SIZE)
+
 
   # draw units
   for unit in units
-    unit.drawAnimated(ctx)
+    [y, x] = unit.centerPosition()
+    if Math.abs(y - myY) + Math.abs(x - myX) < myPlayer.vision or (unit.name == 'bomb' and unit.explosionStartTime?)
+      unit.drawAnimated(ctx) 
 
 
 randomItem = (y, x) ->
   probabilities = [
-    [Bomb, 0.15]
-    [Shuriken, 0.15]
-    [Radar, 0.15]
-    [Shoe, 0.15]
+    [Bomb, 0.13]
+    [Shuriken, 0.13]
+    [Radar, 0.13]
+    [Shoe, 0.13]
+    [Shoe, 0.08]
   ]
 
   roll = Math.random()
@@ -659,6 +689,8 @@ itemAppear = (message) ->
     unitsToAdd.push(new Radar(y, x))
   if itemName == 'shoe'
     unitsToAdd.push(new Shoe(y, x))
+  if itemName == 'glasses'
+    unitsToAdd.push(new Glasses(y, x))
 
 itemAcquired = (message) ->
   [playerIndex, y, x] = message
