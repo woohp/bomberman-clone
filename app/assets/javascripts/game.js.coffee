@@ -391,7 +391,7 @@ class Shoe extends Item
     super('shoe', y, x)
 
   acquiredBy: (player) ->
-    player.speed += 1
+    player.speed -= 1
 
   drawStatic: (ctx) ->
     ctx.drawImage(Shoe.image, @x * GRID_SIZE, @y * GRID_SIZE)
@@ -564,6 +564,8 @@ initGame = (gameMap) ->
   Bomb.image.src = '/assets/bomb.png'
   Radar.image.src = '/assets/radar.png'
   Shuriken.image.src = '/assets/shuriken.png'
+  Shoe.image.src = '/assets/shoe.png'
+  Glasses.image.src = '/assets/glasses.png'
 
   # start game loop
   gameLoop()
@@ -658,7 +660,7 @@ randomItem = (y, x) ->
     [Shuriken, 0.13]
     [Radar, 0.13]
     [Shoe, 0.13]
-    [Shoe, 0.08]
+    [Glasses, 0.08]
   ]
 
   roll = Math.random()
