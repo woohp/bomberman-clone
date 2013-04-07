@@ -10,14 +10,16 @@ class GamesController < ApplicationController
   def show
     my_player_number = nil
 
-  	@game = Game.find(params[:id])
-  	if (@game.player1.id != nil and @game.player1_id != current_user.id and
-  		@game.player2_id != nil and @game.player2_id != current_user.id and
-  		@game.player3_id != nil and @game.player3_id != current_user.id and
-  		@game.player4_id != nil and @game.player4_id != current_user.id) or
+    @game = Game.where(id: params[:id]).first
+    head :not_found and return if @game.nil?
+
+    if (@game.player1.id != nil and @game.player1_id != current_user.id and
+      @game.player2_id != nil and @game.player2_id != current_user.id and
+      @game.player3_id != nil and @game.player3_id != current_user.id and
+      @game.player4_id != nil and @game.player4_id != current_user.id) or
       @game.status != :waiting
-  		head :not_found and return
-		end
+      head :not_found and return
+    end
 
     @bootstrap_data[:game] = @game 
     @bootstrap_data[:websocketUri] = "#{request.host}:#{request.port}/websocket"

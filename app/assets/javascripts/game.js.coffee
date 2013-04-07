@@ -48,10 +48,12 @@ class Player extends Unit
     @numBombs = 1
     @numShurikens = 1
     @numRadars = 1
+    @numShields = 1
     @bombStrength = 3
+    @freezeStartTime = 0
+    @shieldStartTime = 0
 
     # movement related variables
-    @canMove = true
     @targetY = y
     @targetX = x
     @dy = 0
@@ -65,13 +67,10 @@ class Player extends Unit
   pixelRight: -> @pixelX + GRID_SIZE
 
   update: ->
-    now = new Date().getTime()
-    if @freezeStartTime?
-      if now - @freezeStartTime > 2000
-        @freezeStartTime = null
+    if now - @freezeStartTime < 2000
       return
 
-    if @stepsLeft and @canMove
+    if @stepsLeft
       @pixelY += @dPixelY
       @pixelX += @dPixelX
       @stepsLeft -= 1
@@ -139,6 +138,7 @@ class Item extends Unit
 
 class Bomb extends Item
   @image: new Image()
+  @explosionImage: new Image()
 
   constructor: (y, x) ->
     super('bomb', y, x)
@@ -146,10 +146,7 @@ class Bomb extends Item
   update: ->
     return unless @isActive
 
-    now = new Date().getTime()
-    if now - @startTime > 4000
-      @explode()
-
+    @explode() if now - @startTime > 4000
     return unless @explosionStartTime?
 
     if now - @explosionStartTime > 1000
@@ -180,6 +177,8 @@ class Bomb extends Item
         if (y == @y and x >= @left and x <= @right) or (x == @x and y >= @top and y <= @bottom)
           if unit.name == 'bomb' and unit.isActive
             unit.explode()
+          else if unit.name == 'player'
+            unit.dead = true if now - unit.shieldStartTime > 6000
           else
             unit.dead = true
 
@@ -220,7 +219,7 @@ class Bomb extends Item
       if terrain == BRICK or terrain == BOX or unit
         break
 
-    @explosionStartTime = new Date().getTime()
+    @explosionStartTime = now
 
     
   acquiredBy: (player) ->
@@ -232,7 +231,7 @@ class Bomb extends Item
     units.push this
     unitsMap[@y][@x] = this
     @isActive = true
-    @startTime = new Date().getTime()
+    @startTime = now
 
     @user = player
     @strength = player.bombStrength
@@ -251,6 +250,21 @@ class Bomb extends Item
           GRID_SIZE, (@bottom - @top + 1) * GRID_SIZE)
       else
         @drawStatic(ctx)
+
+        # draw some dots
+        ctx.beginPath()
+        for i in [0...10]
+          y = Math.round(Math.random() * (GRID_SIZE / 2))
+          x = Math.round(Math.random() * (GRID_SIZE / 2) + (GRID_SIZE / 2))
+          ctx.strokeStyle = 'black'
+          ctx.rect(@pixelX + x, @pixelY + y, 1, 1)
+          ctx.stroke()
+
+        # draw the timer
+        timeLeft = Math.round((4000 - (now - @startTime)) / 100) / 10
+        ctx.font = "10pt Arial"
+        ctx.strokeStyle = 'white'
+        ctx.strokeText(timeLeft, @pixelX, @pixelY + 10)
     else
       @drawStatic(ctx)
 
@@ -305,7 +319,7 @@ class Shuriken extends Item
     else
       for unit in units when unit.name == 'player' and unit != @user
         continue if unit.pixelX > pixelRight or unit.pixelRight() < @pixelX or unit.pixelY > pixelBottom or unit.pixelBottom() < @pixelY
-        unit.freezeStartTime = new Date().getTime()
+        unit.freezeStartTime = now
         @dead = true
         break
 
@@ -332,7 +346,6 @@ class Radar extends Item
   update: ->
     return unless @isActive
 
-    now = new Date().getTime()
     leftoverReflections = []
     for [[y, x], detectionTime] in @reflections
       if now - detectionTime < 2000
@@ -410,6 +423,38 @@ class Glasses extends Item
     ctx.drawImage(Glasses.image, @x * GRID_SIZE, @y * GRID_SIZE)
 
 
+class Shield extends Item
+  @image: new Image()
+
+  constructor: (y, x) ->
+    super('shield', y, x)
+
+  acquiredBy: (player) ->
+    player.numShields += 1
+
+  _itemCollide: (unit) -> false
+
+  update: ->
+    return unless @isActive
+
+    if now - @user.shieldStartTime > 3000
+      @dead = true
+    else
+      @pixelX = @user.pixelX
+      @pixelY = @user.pixelY
+
+  use: (player) ->
+    units.push this
+    @isActive = true
+    
+    @user = player
+    player.shieldStartTime = now
+    player.numShields -= 1
+
+  drawStatic: (ctx) ->
+    ctx.drawImage(Shield.image, @pixelX, @pixelY)
+
+
 # event variables
 keyDown =
   left: false
@@ -435,6 +480,12 @@ canvas = null
 gameLoopId = null
 socket = null
 channel = null
+
+now = null
+
+sprites =
+  BOX: new Image()
+  BRICK: new Image()
 
 
 initNetwork = ->
@@ -524,9 +575,6 @@ initGame = (gameMap) ->
   ]
   myPlayer = units[myPlayerIndex]
 
-  bomb = new Bomb(1, 0)
-  units.push(bomb)
-  unitsMap[1][0] = bomb
   unitsToAdd = []
 
   
@@ -561,11 +609,17 @@ initGame = (gameMap) ->
   canvas.height = canvasHeight
   canvas.width = canvasWidth
 
+  # load sprites
   Bomb.image.src = '/assets/bomb.png'
+  Bomb.explosionImage.src = '/assets/explosion.png'
   Radar.image.src = '/assets/radar.png'
   Shuriken.image.src = '/assets/shuriken.png'
   Shoe.image.src = '/assets/shoe.png'
   Glasses.image.src = '/assets/glasses.png'
+  Shield.image.src = '/assets/shield.png'
+
+  sprites.BOX.src = '/assets/box.png'
+  sprites.BRICK.src = '/assets/brick.png'
 
   # start game loop
   gameLoop()
@@ -573,6 +627,7 @@ initGame = (gameMap) ->
 
 
 gameLoop = ->
+  now = new Date().getTime()
   readInputs()
   updateGame()
   drawGame()
@@ -599,6 +654,9 @@ readInputs = ->
     else if keyPresses[3] and myPlayer.numRadars
       new Radar(centerY, centerX).use(myPlayer)
       channel.trigger('itemUse', [myPlayerIndex, 'radar', centerY, centerX])
+    else if keyPresses[4] and myPlayer.numShields
+      new Shield(centerY, centerX).use(myPlayer)
+      channel.trigger('itemUse', [myPlayerIndex, 'shield', centerY, centerX])
 
 
 updateGame = ->
@@ -636,11 +694,11 @@ drawGame = ->
 
       if beliefMap[y][x] == EMPTY
         ctx.fillStyle = 'green'
+        ctx.fillRect(x * GRID_SIZE, y * GRID_SIZE, GRID_SIZE, GRID_SIZE)
       else if beliefMap[y][x] == BRICK
-        ctx.fillStyle = 'gray'
+        ctx.drawImage(sprites.BRICK, x * GRID_SIZE, y * GRID_SIZE)
       else if beliefMap[y][x] == BOX
-        ctx.fillStyle = 'BurlyWood'
-      ctx.fillRect(x * GRID_SIZE, y * GRID_SIZE, GRID_SIZE, GRID_SIZE)
+        ctx.drawImage(sprites.BOX, x * GRID_SIZE, y * GRID_SIZE)
 
       if outsideVision
         ctx.fillStyle = 'rgba(64, 64, 64, 0.35)'
@@ -685,14 +743,16 @@ itemAppear = (message) ->
   return if playerIndex == myPlayerIndex
   if itemName == 'bomb'
     unitsToAdd.push(new Bomb(y, x))
-  if itemName == 'shuriken'
+  else if itemName == 'shuriken'
     unitsToAdd.push(new Shuriken(y, x))
-  if itemName == 'radar'
+  else if itemName == 'radar'
     unitsToAdd.push(new Radar(y, x))
-  if itemName == 'shoe'
+  else if itemName == 'shoe'
     unitsToAdd.push(new Shoe(y, x))
-  if itemName == 'glasses'
+  else if itemName == 'glasses'
     unitsToAdd.push(new Glasses(y, x))
+  else if itemName == 'shield'
+    unitsToAdd.push(new Shield(y, x))
 
 itemAcquired = (message) ->
   [playerIndex, y, x] = message
@@ -715,3 +775,5 @@ itemUse = (message) ->
     new Shuriken(y, x).use(player)
   else if itemName == 'radar'
     new Radar(y, x).use(player)
+  else if itemName == 'shield'
+    new Shield(y, x).use(player)
