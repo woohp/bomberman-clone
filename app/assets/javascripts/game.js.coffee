@@ -66,6 +66,31 @@ class Player extends Unit
   pixelBottom: -> @pixelY + GRID_SIZE
   pixelRight: -> @pixelX + GRID_SIZE
 
+  addBomb: ->
+    @numBombs += 1
+    $('#bomb-count').html(@numBombs)
+  removeBomb: ->
+    @numBombs -= 1  
+    $('#bomb-count').html(@numBombs)
+  addShuriken: ->
+    @numShurikens += 1
+    $('#shuriken-count').html(@numShurikens)
+  removeShuriken: ->
+    @numShurikens -= 1
+    $('#shuriken-count').html(@numShurikens)
+  addRadar: ->
+    @numRadars += 1
+    $('#radar-count').html(@numRadars)
+  removeRadar: ->
+    @numRadars -= 1  
+    $('#radar-count').html(@numRadars)
+  addShield: ->
+    @numShields += 1
+    $('#shield-count').html(@numShields)
+  removeShield: ->
+    @numShields -= 1  
+    $('#shield-count').html(@numShields)
+
   update: ->
     if now - @freezeStartTime < 2000
       return
@@ -151,7 +176,7 @@ class Bomb extends Item
 
     if now - @explosionStartTime > 1000
       @dead = true
-      @user.numBombs += 1
+      @user.addBomb()
 
       destroyedBoxes = []
       if trueMap[@y][@left] == BOX
@@ -223,7 +248,7 @@ class Bomb extends Item
 
     
   acquiredBy: (player) ->
-    player.numBombs += 1
+    player.addBomb()
 
   _itemCollide: (unit) -> true
 
@@ -235,7 +260,7 @@ class Bomb extends Item
 
     @user = player
     @strength = player.bombStrength
-    player.numBombs -= 1
+    player.removeBomb()
 
   drawStatic: (ctx) ->
     ctx.drawImage(Bomb.image, @pixelX, @pixelY)
@@ -275,7 +300,7 @@ class Shuriken extends Item
     super('shuriken', y, x)
     
   acquiredBy: (player) ->
-    player.numShurikens += 1
+    player.addShuriken()
 
   _itemCollide: (unit) -> false
 
@@ -284,7 +309,7 @@ class Shuriken extends Item
     @isActive = true
 
     @user = player
-    @user.numShurikens -= 1
+    @user.removeShuriken()
     speed = 12
 
     @dPixelX = 0
@@ -339,7 +364,7 @@ class Radar extends Item
     super('radar', y, x)
 
   acquiredBy: (player) ->
-    player.numRadars += 1
+    player.addRadar()
 
   _itemCollide: (unit) -> false
 
@@ -370,7 +395,7 @@ class Radar extends Item
     @isActive = true
     
     @user = player
-    player.numRadars -= 1
+    player.removeRadar()
     @radius = 1
     @centerY = player.pixelY + GRID_SIZE / 2
     @centerX = player.pixelX + GRID_SIZE / 2
@@ -430,7 +455,7 @@ class Shield extends Item
     super('shield', y, x)
 
   acquiredBy: (player) ->
-    player.numShields += 1
+    player.addShield()
 
   _itemCollide: (unit) -> false
 
@@ -449,7 +474,7 @@ class Shield extends Item
     
     @user = player
     player.shieldStartTime = now
-    player.numShields -= 1
+    player.removeShield()
 
   drawStatic: (ctx) ->
     ctx.drawImage(Shield.image, @pixelX, @pixelY)

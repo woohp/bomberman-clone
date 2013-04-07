@@ -5,5 +5,18 @@
   p#joiner-message
 
 
-br
-canvas#game
+canvas#game(style="display: block")
+
+#items-count
+  .well.well-small
+    = image_tag 'bomb.png'
+    b#bomb-count 1
+  .well.well-small
+    = image_tag 'shuriken.png'
+    b#shuriken-count 1
+  .well.well-small
+    = image_tag 'radar.png'
+    b#radar-count 1
+  .well.well-small
+    = image_tag 'shield.png'
+    b#shield-count 1
