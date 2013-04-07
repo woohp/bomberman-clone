@@ -719,6 +719,7 @@ randomItem = (y, x) ->
     [Radar, 0.13]
     [Shoe, 0.13]
     [Glasses, 0.08]
+    [Shield, 0.1]
   ]
 
   roll = Math.random()
