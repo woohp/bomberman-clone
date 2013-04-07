@@ -238,7 +238,7 @@ class Bomb extends Item
     player.numBombs -= 1
 
   drawStatic: (ctx) ->
-    ctx.drawImage(Bomb.image, @x * GRID_SIZE, @y * GRID_SIZE)
+    ctx.drawImage(Bomb.image, @pixelX, @pixelY)
 
   drawAnimated: (ctx) ->
     if @isActive
@@ -324,7 +324,7 @@ class Shuriken extends Item
         break
 
   drawStatic: (ctx) ->
-    ctx.drawImage(Shuriken.image, @x * GRID_SIZE, @y * GRID_SIZE)
+    ctx.drawImage(Shuriken.image, @pixelX, @pixelY)
 
   drawAnimated: (ctx) ->
     if @isActive
@@ -378,7 +378,7 @@ class Radar extends Item
     @detected = {}
 
   drawStatic: (ctx) ->
-    ctx.drawImage(Radar.image, @x * GRID_SIZE, @y * GRID_SIZE)
+    ctx.drawImage(Radar.image, @pixelX, @pixelY)
 
   drawAnimated: (ctx) ->
     if not @isActive
@@ -407,7 +407,7 @@ class Shoe extends Item
     player.speed -= 1
 
   drawStatic: (ctx) ->
-    ctx.drawImage(Shoe.image, @x * GRID_SIZE, @y * GRID_SIZE)
+    ctx.drawImage(Shoe.image, @pixelX, @pixelY)
 
 
 class Glasses extends Item
@@ -420,7 +420,7 @@ class Glasses extends Item
     player.vision += 1
 
   drawStatic: (ctx) ->
-    ctx.drawImage(Glasses.image, @x * GRID_SIZE, @y * GRID_SIZE)
+    ctx.drawImage(Glasses.image, @pixelX, @pixelY)
 
 
 class Shield extends Item
