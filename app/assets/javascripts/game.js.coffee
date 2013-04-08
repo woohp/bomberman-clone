@@ -66,30 +66,30 @@ class Player extends Unit
   pixelBottom: -> @pixelY + GRID_SIZE
   pixelRight: -> @pixelX + GRID_SIZE
 
+  _addItem: (variableName, displayID) ->
+    return unless @playerName.match(myPlayerIndex+1)
+    this[variableName] += 1
+    $(displayID).html(this[variableName])
+  _removeItem: (variableName, displayID) ->
+    return unless @playerName.match(myPlayerIndex+1)
+    this[variableName] -= 1
+    $(displayID).html(this[variableName])
   addBomb: ->
-    @numBombs += 1
-    $('#bomb-count').html(@numBombs)
+    @_addItem('numBombs', '#bomb-count')
   removeBomb: ->
-    @numBombs -= 1  
-    $('#bomb-count').html(@numBombs)
+    @_removeItem('numBombs', '#bomb-count')
   addShuriken: ->
-    @numShurikens += 1
-    $('#shuriken-count').html(@numShurikens)
+    @_addItem('numShurikens', '#shuriken-count')
   removeShuriken: ->
-    @numShurikens -= 1
-    $('#shuriken-count').html(@numShurikens)
+    @_removeItem('numShurikens', '#shuriken-count')
   addRadar: ->
-    @numRadars += 1
-    $('#radar-count').html(@numRadars)
+    @_addItem('numRadars', '#radar-count')
   removeRadar: ->
-    @numRadars -= 1  
-    $('#radar-count').html(@numRadars)
+    @_removeItem('numRadars', '#radar-count')
   addShield: ->
-    @numShields += 1
-    $('#shield-count').html(@numShields)
+    @_addItem('numShields', '#shield-count')
   removeShield: ->
-    @numShields -= 1  
-    $('#shield-count').html(@numShields)
+    @_removeItem('numShields', '#shield-count')
 
   update: ->
     if now - @freezeStartTime < 2000
