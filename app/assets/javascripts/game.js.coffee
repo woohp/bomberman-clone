@@ -480,6 +480,20 @@ class Shield extends Item
     ctx.drawImage(Shield.image, @pixelX, @pixelY)
 
 
+class Explosive extends Item
+  @image: new Image()
+
+  constructor: (y, x) ->
+    super('explosive', y, x)
+
+  acquiredBy: (player) ->
+    player.bombStrength += 1
+
+  _itemCollide: -> false
+
+  drawStatic: (ctx) ->
+    ctx.drawImage(Explosive.image, @pixelX, @pixelY)
+
 # event variables
 keyDown =
   left: false
@@ -635,6 +649,7 @@ initGame = (gameMap) ->
   Shoe.image.src = '/assets/shoe.png'
   Glasses.image.src = '/assets/glasses.png'
   Shield.image.src = '/assets/shield.png'
+  Explosive.image.src = '/assets/explosive.png'
 
   sprites.BOX.src = '/assets/box.png'
   sprites.BRICK.src = '/assets/brick.png'
@@ -665,7 +680,7 @@ readInputs = ->
   if unitsMap[centerY][centerX] == null
     if keyPresses[1] and myPlayer.numBombs
       new Bomb(centerY, centerX).use(myPlayer)
-      channel.trigger('itemUse', [myPlayerIndex, 'bomb', centerY, centerX])
+      channel.trigger('itemUse', [myPlayerIndex, 'bomb', centerY, centerX, myPlayer.bombStrength])
     else if keyPresses[2] and myPlayer.numShurikens
       new Shuriken(centerY, centerX).use(myPlayer)
       channel.trigger('itemUse', [myPlayerIndex, 'shuriken', centerY, centerX, myPlayer.direction])
@@ -738,6 +753,7 @@ randomItem = (y, x) ->
     [Shoe, 0.13]
     [Glasses, 0.08]
     [Shield, 0.1]
+    [Explosive, 0.13]
   ]
 
   roll = Math.random()
@@ -772,6 +788,8 @@ itemAppear = (message) ->
     unitsToAdd.push(new Glasses(y, x))
   else if itemName == 'shield'
     unitsToAdd.push(new Shield(y, x))
+  else if itemName == 'explosive'
+    unitsToAdd.push(new Explosive(y, x))
 
 itemAcquired = (message) ->
   [playerIndex, y, x] = message
@@ -787,10 +805,10 @@ itemUse = (message) ->
   player = units[playerIndex]
 
   if itemName == 'bomb'
+    player.bombStrength = message[4]
     new Bomb(y, x).use(player)
   else if itemName == 'shuriken'
-    direction = message[4]
-    player.direction = direction
+    player.direction = message[4]
     new Shuriken(y, x).use(player)
   else if itemName == 'radar'
     new Radar(y, x).use(player)
