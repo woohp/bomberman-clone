@@ -490,8 +490,8 @@ keyPresses = {}
 
    
 # global variables
-height = 11
-width = 11
+height = 15
+width = 15
 canvasHeight = null
 canvasWidth = null
 units = null
@@ -542,21 +542,14 @@ initNetwork = ->
       alert "Failed to start game: #{message}"
 
     #initialize map
-    gameMap = [
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-      [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-    ]
-    for y in [0...height] by 1
-      for x in [0...width] by 1
+    gameMap = []
+    for i in [0...height]
+      row = (EMPTY for j in [0...width])
+      if i % 2
+        row[j] = BRICK for j in [1...width] by 2
+      gameMap.push row
+    for y in [0...height]
+      for x in [0...width]
         gameMap[y][x] = BOX if Math.random() < 0.3 and gameMap[y][x] == EMPTY
     gameMap[0][0] = EMPTY
     gameMap[0][1] = EMPTY
