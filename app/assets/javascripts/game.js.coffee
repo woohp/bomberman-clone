@@ -40,6 +40,9 @@ class Unit
 class Player extends Unit
   constructor: (@playerName, y, x, @speed) ->
     super('player', y, x)
+    @startingY = y
+    @startingX = x
+    @reallyDead = false # used to indicate whether to truly 
 
     # vision
     @vision = 7
@@ -515,6 +518,7 @@ beliefMap = null
 unitsMap = null
 myPlayerIndex = null
 myPlayer = null
+myLives = null
 canvas = null
 gameLoopId = null
 socket = null
@@ -590,6 +594,7 @@ initNetwork = ->
   channel.bind 'itemAppear', itemAppear
   channel.bind 'itemAcquired', itemAcquired
   channel.bind 'itemUse', itemUse
+  channel.bind 'imdead', killUser
 
 
 initGame = (gameMap) ->
@@ -606,6 +611,7 @@ initGame = (gameMap) ->
     new Player('p4', height-1, width-1, 12)
   ]
   myPlayer = units[myPlayerIndex]
+  myLives = 3
 
   unitsToAdd = []
 
@@ -698,10 +704,27 @@ updateGame = ->
 
   aliveUnits = []
   for u in units
-    if u.dead
-      unitsMap[u.y][u.x] = null
-    else
+    if not u.dead
       aliveUnits.push(u)
+    else if u.name != 'player'
+      unitsMap[u.y][u.x] = null
+    else if u.playerName != myPlayer.playerName
+      # another player died so don't remove him, wait for his "I'm dead" message
+      aliveUnits.push(u) unless u.reallyDead
+    else
+      # respawn self if has lives left
+      myLives--
+      $('#live-count > img:first').remove()
+      if myLives > 0
+        # just create a new player and give it a temporary shield
+        myPlayer = new Player(myPlayer.playerName, myPlayer.startingY, myPlayer.startingX, 12)
+        myPlayer.shieldStartTime = now
+        aliveUnits.push(myPlayer)
+        unitsMap[myPlayer.y][myPlayer.x] = myPlayer
+      else
+        channel.trigger('imdead', myPlayerIndex)
+        alert 'Game Over!'
+
   units = aliveUnits
 
   for unit in unitsToAdd
@@ -814,3 +837,8 @@ itemUse = (message) ->
     new Radar(y, x).use(player)
   else if itemName == 'shield'
     new Shield(y, x).use(player)
+
+killUser = (playerIndex) ->
+  return if playerIndex == myPlayerIndex
+  units[playerIndex].dead = true
+  units[playerIndex].reallyDead = true
