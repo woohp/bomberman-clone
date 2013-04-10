@@ -529,6 +529,7 @@ now = null
 sprites =
   BOX: new Image()
   BRICK: new Image()
+  EMPTY: new Image()
 
 
 initNetwork = ->
@@ -659,6 +660,7 @@ initGame = (gameMap) ->
 
   sprites.BOX.src = '/assets/box.png'
   sprites.BRICK.src = '/assets/brick.png'
+  sprites.EMPTY.src = '/assets/grass.png'
 
   # start game loop
   gameLoop()
@@ -749,15 +751,14 @@ drawGame = ->
         outsideVision = false
 
       if beliefMap[y][x] == EMPTY
-        ctx.fillStyle = 'green'
-        ctx.fillRect(x * GRID_SIZE, y * GRID_SIZE, GRID_SIZE, GRID_SIZE)
+        ctx.drawImage(sprites.EMPTY, x * GRID_SIZE, y * GRID_SIZE)
       else if beliefMap[y][x] == BRICK
         ctx.drawImage(sprites.BRICK, x * GRID_SIZE, y * GRID_SIZE)
       else if beliefMap[y][x] == BOX
         ctx.drawImage(sprites.BOX, x * GRID_SIZE, y * GRID_SIZE)
 
       if outsideVision
-        ctx.fillStyle = 'rgba(64, 64, 64, 0.35)'
+        ctx.fillStyle = 'rgba(64, 64, 64, 0.7)'
         ctx.fillRect(x * GRID_SIZE, y * GRID_SIZE, GRID_SIZE, GRID_SIZE)
 
 
