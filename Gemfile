@@ -28,6 +28,7 @@ gem 'websocket-rails'
 gem 'sorcery'
 gem 'bootstrap_form'
 gem 'simple_enum'
+gem 'redis'
 
 group :development do
   gem 'better_errors'
