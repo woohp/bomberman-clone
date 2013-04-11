@@ -66,6 +66,11 @@ class Player extends Unit
     @stepsLeft = 0
     @direction = DOWN
 
+    $('#bomb-count').html(@numBombs)
+    $('#shuriken-count').html(@numShurikens)
+    $('#radar-count').html(@numRadars)
+    $('#shield-count').html(@numShields)
+
   pixelBottom: -> @pixelY + GRID_SIZE
   pixelRight: -> @pixelX + GRID_SIZE
 
@@ -289,7 +294,7 @@ class Bomb extends Item
         timeLeft = Math.round((4000 - (now - @startTime)) / 100) / 10
         ctx.font = "10pt Arial"
         ctx.strokeStyle = 'white'
-        ctx.strokeText(timeLeft, @pixelX, @pixelY + 10)
+        ctx.strokeText(timeLeft, @pixelX, @pixelY + 12)
     else
       @drawStatic(ctx)
 
