@@ -776,24 +776,28 @@ drawGame = ->
 
 
 randomItem = (y, x) ->
-  probabilities = [
-    [Bomb, 0.13]
-    [Shuriken, 0.13]
-    [Radar, 0.13]
-    [Shoe, 0.13]
-    [Glasses, 0.08]
-    [Shield, 0.1]
-    [Explosive, 0.13]
+  return null if Math.random() < 0.2
+
+  weights = [
+    [Bomb, 100]
+    [Shuriken, 100]
+    [Radar, 100]
+    [Shoe, 100]
+    [Glasses, 60]
+    [Shield, 75]
+    [Explosive, 100]
   ]
+  totalWeight = 0
+  for [klass, weight] in weights
+    totalWeight += weight
 
   roll = Math.random()
-  for [klass, p] in probabilities
+  for [klass, weight] in weights
+    p = weight / totalWeight
     if roll < p
       return new klass(y, x)
    
     roll -= p
-
-  return null
 
 
 unitMove = (message) ->
