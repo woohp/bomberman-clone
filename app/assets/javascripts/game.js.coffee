@@ -140,10 +140,7 @@ class Player extends Unit
     return true
 
   drawStatic: (ctx) ->
-    ctx.beginPath()
-    ctx.strokeStyle = 'white'
-    ctx.rect(@pixelX, @pixelY, GRID_SIZE, GRID_SIZE)
-    ctx.stroke()
+    ctx.drawImage(sprites[@playerName], @pixelX, @pixelY)
 
 
 class Item extends Unit
@@ -530,6 +527,10 @@ sprites =
   BOX: new Image()
   BRICK: new Image()
   EMPTY: new Image()
+  p1: new Image()
+  p2: new Image()
+  p3: new Image()
+  p4: new Image()
 
 
 initNetwork = ->
@@ -661,6 +662,11 @@ initGame = (gameMap) ->
   sprites.BOX.src = '/assets/box.png'
   sprites.BRICK.src = '/assets/brick.png'
   sprites.EMPTY.src = '/assets/grass.png'
+
+  sprites.p1.src = '/assets/player1.png'
+  sprites.p2.src = '/assets/player2.png'
+  sprites.p3.src = '/assets/player3.png'
+  sprites.p4.src = '/assets/player4.png'
 
   # start game loop
   gameLoop()
