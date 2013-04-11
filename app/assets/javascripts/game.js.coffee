@@ -38,13 +38,13 @@ class Unit
     @drawStatic(ctx)
 
 class Player extends Unit
-  constructor: (@playerName, y, x, @speed) ->
+  constructor: (@playerName, y, x) ->
     super('player', y, x)
     @startingY = y
     @startingX = x
     @reallyDead = false # used to indicate whether to truly 
 
-    # vision
+    @speed = 14
     @vision = 7
 
     # items related
@@ -432,7 +432,7 @@ class Shoe extends Item
     super('shoe', y, x)
 
   acquiredBy: (player) ->
-    player.speed -= 1
+    player.speed -= 1 if player.speed > 7
 
   drawStatic: (ctx) ->
     ctx.drawImage(Shoe.image, @pixelX, @pixelY)
@@ -606,10 +606,10 @@ initGame = (gameMap) ->
 
   # initialize units
   units = [
-    new Player('p1', 0, 0, 12),
-    new Player('p2', height-1, 0, 12),
-    new Player('p3', 0, width-1, 12),
-    new Player('p4', height-1, width-1, 12)
+    new Player('p1', 0, 0),
+    new Player('p2', height-1, 0),
+    new Player('p3', 0, width-1),
+    new Player('p4', height-1, width-1)
   ]
   myPlayer = units[myPlayerIndex]
   myLives = 3
