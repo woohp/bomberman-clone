@@ -598,6 +598,7 @@ initNetwork = ->
     $('#joiner-message').hide()
     $('#restart-game').show()
     $('#items-count').show()
+    $('#players-list').hide()
     initGame(gameMap)
 
   channel.bind 'move', unitMove
@@ -605,6 +606,7 @@ initNetwork = ->
   channel.bind 'itemAcquired', itemAcquired
   channel.bind 'itemUse', itemUse
   channel.bind 'imdead', killUser
+  channel.bind 'playerJoined', playerJoined
 
   # attach key events handlers (technically doesn't belong here, but whatever)
   $('body').keydown((e) ->
@@ -806,6 +808,9 @@ randomItem = (y, x) ->
    
     roll -= p
 
+
+playerJoined = (message) ->
+  $('#players-list > ol').append("<li>#{message}</li>")
 
 unitMove = (message) ->
   playerIndex = message[0]

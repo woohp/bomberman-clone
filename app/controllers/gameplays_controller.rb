@@ -24,21 +24,30 @@ class GameplaysController < WebsocketRails::BaseController
   def join
   	game = Game.where(id: message).first
 
+    # fail if game not found
   	trigger_failure if game.nil?
+
+    # if the player has already joined, do nothing
+    if game.player2_id == current_user.id or
+      game.player3_id == current_user.id or
+      game.player4_id == current_user.id
+      trigger_success game and return
+    end
+
   	Game.transaction do
-  		if game.player2_id.nil? or game.player2_id == current_user.id
+  		if game.player2_id.nil?
   			game.player2 = current_user
-  		elsif game.player3_id.nil? or game.player3_id == current_user.id
+  		elsif game.player3_id.nil?
   			game.player3 = current_user
-  		elsif game.player4_id.nil? or game.player4_id == current_user.id
+  		elsif game.player4_id.nil?
   			game.player4 = current_user
   		else
   			trigger_failure game and return if game.nil?
   		end
   	end
-
     game.save
 
+    WebsocketRails["game_#{game.id}"].trigger('playerJoined', current_user.username)
   	trigger_success game
   end
 end

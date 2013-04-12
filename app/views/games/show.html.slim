@@ -2,7 +2,17 @@
   .row
   	button#start-game.btn.btn-primary.btn-large.span2 Start Game
 - else
-  p#joiner-message.well.well-small
+  p#joiner-message.well.well-small(style="display: none; margin-bottom: 4px;")
+
+#players-list
+  h3 Players
+  ol
+    - if @game.player1_id
+      li= @game.player1.username
+    - if @game.player2_id
+      li= @game.player2.username
+    - if @game.player3_id
+      li= @game.player3.username
 
 
 canvas#game(width="0" height="0" style="display: block")
