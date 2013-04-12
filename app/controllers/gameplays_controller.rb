@@ -3,13 +3,15 @@ class GameplaysController < WebsocketRails::BaseController
     id = message[:id]
     game_map = message[:map]
 
-    game = Game.where(id: id, status_cd: Game.waiting).first
+    game = Game.where(id: id).first
     if game.nil?
       trigger_failure 'game does not exist' and return
     elsif game.player1_id != current_user.id
       trigger_failure 'not host of game' and return
     elsif game.player2_id.nil?
       trigger_failure 'no one has joined the game yet' and return
+    elsif game.status == :done
+      trigger_failure 'game has ended already'
     end
 
     game.status = :in_progress

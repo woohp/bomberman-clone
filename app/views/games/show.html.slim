@@ -24,3 +24,6 @@ canvas#game(style="display: block")
   .well.well-small
     = image_tag 'shield.png'
     b#shield-count 1
+
+- if @game.player1_id == current_user.id
+  button#restart-game.btn.btn-primary(style="display: none;") Restart Game

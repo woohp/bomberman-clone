@@ -562,7 +562,7 @@ initNetwork = ->
       socket.trigger('games.join', game_id, success, failed)
 
   # starting a game
-  $('#start-game').click ->
+  $('#start-game, #restart-game').click ->
     failed = (message) ->
       alert "Failed to start game: #{message}"
 
@@ -591,10 +591,12 @@ initNetwork = ->
 
     socket.trigger('games.start', {id: game_id, map: gameMap}, null, failed)
 
+  # join the channel for this game
   channel = socket.subscribe("game_#{game_id}")
   channel.bind 'start', (gameMap) ->
     $('#start-game').hide()
     $('#joiner-message').hide()
+    $('#restart-game').show()
     initGame(gameMap)
 
   channel.bind 'move', unitMove
@@ -603,27 +605,7 @@ initNetwork = ->
   channel.bind 'itemUse', itemUse
   channel.bind 'imdead', killUser
 
-
-initGame = (gameMap) ->
-  trueMap = gameMap  
-  beliefMap = $.extend(true, [], trueMap)
-
-  unitsMap = ((null for x in [0...width]) for y in [0...height])
-
-  # initialize units
-  units = [
-    new Player('p1', 0, 0),
-    new Player('p2', height-1, 0),
-    new Player('p3', 0, width-1),
-    new Player('p4', height-1, width-1)
-  ]
-  myPlayer = units[myPlayerIndex]
-  myLives = 3
-
-  unitsToAdd = []
-
-  
-  # attach event handlers
+  # attach key events handlers (technically doesn't belong here, but whatever)
   $('body').keydown((e) ->
     if e.which == 37
       keyDown.left = true
@@ -647,6 +629,24 @@ initGame = (gameMap) ->
       keyPresses[e.which - 48] = true
   )
 
+
+initGame = (gameMap) ->
+  trueMap = gameMap  
+  beliefMap = $.extend(true, [], trueMap)
+
+  unitsMap = ((null for x in [0...width]) for y in [0...height])
+
+  # initialize units
+  units = [
+    new Player('p1', 0, 0),
+    new Player('p2', height-1, 0),
+    new Player('p3', 0, width-1),
+    new Player('p4', height-1, width-1)
+  ]
+  myPlayer = units[myPlayerIndex]
+  myLives = 3
+  unitsToAdd = []
+  
   # initialize drawing
   canvasHeight = height * GRID_SIZE
   canvasWidth = width * GRID_SIZE
@@ -675,6 +675,7 @@ initGame = (gameMap) ->
 
   # start game loop
   gameLoop()
+  clearInterval(gameLoopId)
   gameLoopId = setInterval(gameLoop, 25)
 
 
