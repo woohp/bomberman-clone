@@ -556,9 +556,9 @@ initNetwork = ->
           myPlayerIndex = 2
         else if game.player4_id == bootstrap_data.current_user.id
           myPlayerIndex = 3
-        $('#joiner-message').html("Joined game as player #{myPlayerIndex+1}, waiting for host to start game...")
+        $('#joiner-message').show().html("Joined game as player #{myPlayerIndex+1}, waiting for host to start game...")
       failed = (message) ->
-        $('#joiner-message').html("Failed to join game: #{message}")
+        $('#joiner-message').show().html("Failed to join game: #{message}")
       socket.trigger('games.join', game_id, success, failed)
 
   # starting a game
@@ -597,6 +597,7 @@ initNetwork = ->
     $('#start-game').hide()
     $('#joiner-message').hide()
     $('#restart-game').show()
+    $('#items-count').show()
     initGame(gameMap)
 
   channel.bind 'move', unitMove

@@ -2,12 +2,12 @@
   .row
   	button#start-game.btn.btn-primary.btn-large.span2 Start Game
 - else
-  p#joiner-message
+  p#joiner-message.well.well-small
 
 
-canvas#game(style="display: block")
+canvas#game(width="0" height="0" style="display: block")
 
-#items-count
+#items-count(style="display: none;")
   #live-count.well.well-small
     = image_tag 'heart.png'
     = image_tag 'heart.png'
