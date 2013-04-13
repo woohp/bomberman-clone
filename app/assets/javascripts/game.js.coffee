@@ -704,19 +704,18 @@ readInputs = ->
     moved = myPlayer.move(1, 0)
 
   [centerY, centerX] = myPlayer.centerPosition()
-  if unitsMap[centerY][centerX] == null
-    if keyPresses[1] and myPlayer.numBombs
-      new Bomb(centerY, centerX).use(myPlayer)
-      channel.trigger('itemUse', [myPlayerIndex, 'bomb', centerY, centerX, myPlayer.bombStrength])
-    else if keyPresses[2] and myPlayer.numShurikens
-      new Shuriken(centerY, centerX).use(myPlayer)
-      channel.trigger('itemUse', [myPlayerIndex, 'shuriken', centerY, centerX, myPlayer.direction])
-    else if keyPresses[3] and myPlayer.numRadars
-      new Radar(centerY, centerX).use(myPlayer)
-      channel.trigger('itemUse', [myPlayerIndex, 'radar', centerY, centerX])
-    else if keyPresses[4] and myPlayer.numShields
-      new Shield(centerY, centerX).use(myPlayer)
-      channel.trigger('itemUse', [myPlayerIndex, 'shield', centerY, centerX])
+  if keyPresses[1] and myPlayer.numBombs and unitsMap[centerY][centerX] == null
+    new Bomb(centerY, centerX).use(myPlayer)
+    channel.trigger('itemUse', [myPlayerIndex, 'bomb', centerY, centerX, myPlayer.bombStrength])
+  else if keyPresses[2] and myPlayer.numShurikens
+    new Shuriken(centerY, centerX).use(myPlayer)
+    channel.trigger('itemUse', [myPlayerIndex, 'shuriken', centerY, centerX, myPlayer.direction])
+  else if keyPresses[3] and myPlayer.numRadars
+    new Radar(centerY, centerX).use(myPlayer)
+    channel.trigger('itemUse', [myPlayerIndex, 'radar', centerY, centerX])
+  else if keyPresses[4] and myPlayer.numShields
+    new Shield(centerY, centerX).use(myPlayer)
+    channel.trigger('itemUse', [myPlayerIndex, 'shield', centerY, centerX])
 
 
 updateGame = ->
