@@ -48,7 +48,8 @@ class Player extends Unit
     @vision = 7
 
     # items related
-    @numBombs = 1
+    @numBombs = 1 
+    @numBombsTotal = 1
     @numShurikens = 1
     @numRadars = 1
     @numShields = 1
@@ -254,6 +255,7 @@ class Bomb extends Item
     
   acquiredBy: (player) ->
     player.addBomb()
+    player.numBombsTotal += 1
 
   _itemCollide: (unit) -> true
 
@@ -742,11 +744,16 @@ updateGame = ->
         # just create a new player and give it a temporary shield
         myNewPlayer = new Player(myPlayer.playerName, myPlayer.startingY, myPlayer.startingX, 12)
         myNewPlayer.shieldStartTime = now
-        myNewPlayer.numBombs = myPlayer.numBombs
+        myNewPlayer.numBombs = myPlayer.numBombsTotal
+        myNewPlayer.numBombsTotal = myPlayer.numBombsTotal
         myNewPlayer.numShields = myPlayer.numShields
         myNewPlayer.numRadars = myPlayer.numRadars
         myNewPlayer.numShurikens = myPlayer.numShurikens
+        myNewPlayer.vision = myPlayer.vision
+        myNewPlayer.speed = myPlayer.speed
+        myNewPlayer.bombStrength = myPlayer.bombStrength
         aliveUnits.push(myNewPlayer)
+        unitsMap[myPlayer.y][myPlayer.x] = null
         unitsMap[myNewPlayer.y][myNewPlayer.x] = myNewPlayer
         myPlayer = myNewPlayer
       else
