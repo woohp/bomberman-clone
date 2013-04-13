@@ -515,6 +515,7 @@ canvasHeight = null
 canvasWidth = null
 units = null
 unitsToAdd = null
+numPlayers = null
 trueMap = null
 beliefMap = null
 unitsMap = null
@@ -648,6 +649,7 @@ initGame = (gameMap) ->
   ]
   myPlayer = units[myPlayerIndex]
   myLives = 3
+  numPlayers = $('#players-list li').size()
   unitsToAdd = []
   
   # initialize drawing
@@ -689,6 +691,8 @@ gameLoop = ->
   drawGame()
 
 readInputs = ->
+  return if myLives == 0
+
   moved = false
   if keyDown.left
     moved = myPlayer.move(0, -1)
@@ -727,20 +731,28 @@ updateGame = ->
       unitsMap[u.y][u.x] = null
     else if u.playerName != myPlayer.playerName
       # another player died so don't remove him, wait for his "I'm dead" message
-      aliveUnits.push(u) unless u.reallyDead
+      unless u.reallyDead
+        aliveUnits.push(u)
+      else if u.playerName < myPlayer.playerName
+        myPlayerIndex--
     else
       # respawn self if has lives left
       myLives--
       $('#live-count > img:first').remove()
       if myLives > 0
         # just create a new player and give it a temporary shield
-        myPlayer = new Player(myPlayer.playerName, myPlayer.startingY, myPlayer.startingX, 12)
-        myPlayer.shieldStartTime = now
-        aliveUnits.push(myPlayer)
-        unitsMap[myPlayer.y][myPlayer.x] = myPlayer
+        myNewPlayer = new Player(myPlayer.playerName, myPlayer.startingY, myPlayer.startingX, 12)
+        myNewPlayer.shieldStartTime = now
+        myNewPlayer.numBombs = myPlayer.numBombs
+        myNewPlayer.numShields = myPlayer.numShields
+        myNewPlayer.numRadars = myPlayer.numRadars
+        myNewPlayer.numShurikens = myPlayer.numShurikens
+        aliveUnits.push(myNewPlayer)
+        unitsMap[myNewPlayer.y][myNewPlayer.x] = myNewPlayer
       else
         channel.trigger('imdead', myPlayerIndex)
-        alert 'Game Over!'
+        socket.trigger('games.lost')
+        alert 'You got pwned!!'
 
   units = aliveUnits
 
@@ -761,7 +773,7 @@ drawGame = ->
   for y in [0...height]
     for x in [0...width]
       outsideVision = true
-      if Math.abs(y - myY) + Math.abs(x - myX) < myPlayer.vision
+      if myLives == 0 or Math.abs(y - myY) + Math.abs(x - myX) < myPlayer.vision
         beliefMap[y][x] = trueMap[y][x]
         outsideVision = false
 
@@ -780,7 +792,7 @@ drawGame = ->
   # draw units
   for unit in units
     [y, x] = unit.centerPosition()
-    if Math.abs(y - myY) + Math.abs(x - myX) < myPlayer.vision or (unit.name == 'bomb' and unit.explosionStartTime?)
+    if myLives == 0 or Math.abs(y - myY) + Math.abs(x - myX) < myPlayer.vision or (unit.name == 'bomb' and unit.explosionStartTime?)
       unit.drawAnimated(ctx) 
 
 
@@ -865,3 +877,9 @@ killUser = (playerIndex) ->
   return if playerIndex == myPlayerIndex
   units[playerIndex].dead = true
   units[playerIndex].reallyDead = true
+
+  # if I haven't lost yet and am the last one standing, I won!
+  numPlayers -= 1
+  if numPlayers == 1 and myLives > 0
+    socket.trigger('games.won')
+    alert 'You won!'

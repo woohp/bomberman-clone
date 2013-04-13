@@ -45,5 +45,7 @@ WebsocketRails::EventMap.describe do
   namespace :games do
     subscribe :start, to: GameplaysController, with_method: "start"
     subscribe :join, to: GameplaysController, with_method: "join"
+    subscribe :won, to: GameplaysController, with_method: "won"
+    subscribe :lost, to: GameplaysController, with_method: "lost"
   end
 end

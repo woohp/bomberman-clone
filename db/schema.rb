@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130316215720) do
+ActiveRecord::Schema.define(:version => 20130413025059) do
 
   create_table "games", :force => true do |t|
     t.integer  "player1_id"
@@ -40,6 +40,8 @@ ActiveRecord::Schema.define(:version => 20130316215720) do
     t.string   "reset_password_token"
     t.datetime "reset_password_token_expires_at"
     t.datetime "reset_password_email_sent_at"
+    t.integer  "wins"
+    t.integer  "loses"
   end
 
   add_index "users", ["remember_me_token"], :name => "index_users_on_remember_me_token"

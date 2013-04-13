@@ -50,4 +50,20 @@ class GameplaysController < WebsocketRails::BaseController
     WebsocketRails["game_#{game.id}"].trigger('playerJoined', current_user.username)
   	trigger_success game
   end
+
+  def won
+    current_user.wins ||= 0
+    current_user.wins += 1
+    current_user.save
+
+    trigger_success
+  end
+
+  def lost
+    current_user.loses ||= 0
+    current_user.loses += 1
+    current_user.save
+
+    trigger_success
+  end
 end
