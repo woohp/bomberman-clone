@@ -748,6 +748,7 @@ updateGame = ->
         myNewPlayer.numShurikens = myPlayer.numShurikens
         aliveUnits.push(myNewPlayer)
         unitsMap[myNewPlayer.y][myNewPlayer.x] = myNewPlayer
+        myPlayer = myNewPlayer
       else
         channel.trigger('imdead', myPlayerIndex)
         socket.trigger('games.lost')
