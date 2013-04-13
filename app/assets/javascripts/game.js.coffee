@@ -100,7 +100,7 @@ class Player extends Unit
     @_removeItem('numShields', '#shield-count')
 
   update: ->
-    if now - @freezeStartTime < 2000
+    if now - @freezeStartTime < 2500
       return
 
     if @stepsLeft
@@ -576,7 +576,7 @@ initNetwork = ->
       gameMap.push row
     for y in [0...height]
       for x in [0...width]
-        gameMap[y][x] = BOX if Math.random() < 0.3 and gameMap[y][x] == EMPTY
+        gameMap[y][x] = BOX if Math.random() < 0.6 and gameMap[y][x] == EMPTY
     gameMap[0][0] = EMPTY
     gameMap[0][1] = EMPTY
     gameMap[1][0] = EMPTY
