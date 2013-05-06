@@ -45,7 +45,7 @@ class Player extends Unit
     @reallyDead = false # used to indicate whether to truly 
 
     @speed = 14
-    @vision = 7
+    @vision = 5
 
     # items related
     @numBombs = 1 
@@ -180,7 +180,7 @@ class Bomb extends Item
     @explode() if now - @startTime > 4000
     return unless @explosionStartTime?
 
-    if now - @explosionStartTime > 1000
+    if now - @explosionStartTime > 500
       @dead = true
       @user.addBomb()
 
@@ -808,11 +808,11 @@ randomItem = (y, x) ->
 
   weights = [
     [Bomb, 100]
-    [Shuriken, 100]
-    [Radar, 100]
+    [Shuriken, 150]
+    [Radar, 60]
     [Shoe, 100]
-    [Glasses, 60]
-    [Shield, 75]
+    [Glasses, 40]
+    [Shield, 100]
     [Explosive, 100]
   ]
   totalWeight = 0
